@@ -12,6 +12,7 @@ const { Boom } = require('@hapi/boom')
 const { Session } = require('../models/Session')
 const logger = require('../utils/logger')
 const { processMessage } = require('./messageHandler')
+const { registerSocket } = require('../services/alertService')
 
 let retryCount = 0
 const MAX_RETRIES = 5
@@ -45,20 +46,20 @@ const startBot = async () => {
         creds: state.creds,
         keys: makeCacheableSignalKeyStore(state.keys, {
           level: 'silent',
-          trace: () => {},
-          debug: () => {},
-          info: () => {},
-          warn: () => {},
-          error: () => {},
-          fatal: () => {},
+          trace: () => { },
+          debug: () => { },
+          info: () => { },
+          warn: () => { },
+          error: () => { },
+          fatal: () => { },
           child: () => ({
             level: 'silent',
-            trace: () => {},
-            debug: () => {},
-            info: () => {},
-            warn: () => {},
-            error: () => {},
-            fatal: () => {},
+            trace: () => { },
+            debug: () => { },
+            info: () => { },
+            warn: () => { },
+            error: () => { },
+            fatal: () => { },
             child: () => ({}),
           }),
         }),
@@ -66,20 +67,20 @@ const startBot = async () => {
       printQRInTerminal: false,
       logger: {
         level: 'silent',
-        trace: () => {},
-        debug: () => {},
-        info: () => {},
+        trace: () => { },
+        debug: () => { },
+        info: () => { },
         warn: (obj) => logger.warn(typeof obj === 'object' ? JSON.stringify(obj) : obj),
         error: (obj) => logger.error(typeof obj === 'object' ? JSON.stringify(obj) : obj),
         fatal: (obj) => logger.error(typeof obj === 'object' ? JSON.stringify(obj) : obj),
         child: () => ({
           level: 'silent',
-          trace: () => {},
-          debug: () => {},
-          info: () => {},
-          warn: () => {},
-          error: () => {},
-          fatal: () => {},
+          trace: () => { },
+          debug: () => { },
+          info: () => { },
+          warn: () => { },
+          error: () => { },
+          fatal: () => { },
           child: () => ({}),
         }),
       },
@@ -127,6 +128,7 @@ const startBot = async () => {
       if (connection === 'open') {
         retryCount = 0
         logger.info('✅ WhatsApp bot connected and ready!')
+        registerSocket(sock)
       }
     })
 

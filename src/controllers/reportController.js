@@ -1,6 +1,7 @@
 'use strict'
 
 const reportService = require('../services/reportService')
+const subscriptionService = require('../services/subscriptionService')
 const { capitalize, getTimeAgo, sanitizeArea } = require('../utils/helpers')
 const { ValidationError } = require('../utils/errors')
 const logger = require('../utils/logger')
@@ -46,6 +47,20 @@ _Example: any light in Ikeja?_ or _Ikeja how far?_
 
 *📋 See all active reports:*
 _show all reports_
+
+*🔔 Subscribe to area alerts:*
+- subscribe [area]
+- alert me for [area]
+_Example: subscribe Yaba_
+
+*🔕 Unsubscribe:*
+- unsubscribe [area]
+- unsubscribe all
+_Example: unsubscribe Yaba_
+
+*📋 My subscriptions:*
+- my subscriptions
+- my alerts
 
 Reports expire after 6 hours automatically.
 Thank you for keeping Nigeria powered! 🇳🇬`,
@@ -265,6 +280,71 @@ const handleAreaCheck = async (text) => {
 }
 
 /**
+ * Handle subscribe to area alerts
+ */
+const handleSubscribe = async (text, reportedBy) => {
+  const match = text.match(
+    /(?:subscribe|alert\s+me\s+(?:for|to)|notify\s+me\s+(?:for|about)|turn\s+on\s+alerts\s+for)\s+(.+?)(?:\?|$)/i
+  )
+  if (!match) return null
+
+  const area = capitalize(sanitizeArea(match[1]))
+  if (!area || area.length < 2) throw new ValidationError('Please provide a valid area name.')
+
+  const phone = reportedBy.replace('@s.whatsapp.net', '').replace('@lid', '')
+  await subscriptionService.subscribe(phone, area)
+
+  return `🔔 *Subscribed!*\n\nYou will receive alerts when light goes or comes back in *${area}*.\n\nSend *unsubscribe ${area}* to stop alerts anytime.`
+}
+
+/**
+ * Handle unsubscribe from area alerts
+ */
+const handleUnsubscribe = async (text, reportedBy) => {
+  // Unsubscribe from all
+  const unsubAll = text.match(/(?:unsubscribe\s+all|stop\s+all\s+alerts|cancel\s+all\s+alerts)/i)
+  if (unsubAll) {
+    const phone = reportedBy.replace('@s.whatsapp.net', '').replace('@lid', '')
+    const count = await subscriptionService.unsubscribeAll(phone)
+    return `🔕 *Unsubscribed from all areas.*\nYou will no longer receive any alerts.`
+  }
+
+  // Unsubscribe from specific area
+  const match = text.match(
+    /(?:unsubscribe|stop\s+alerts\s+for|turn\s+off\s+alerts\s+for|cancel\s+alerts\s+for)\s+(.+?)(?:\?|$)/i
+  )
+  if (!match) return null
+
+  const area = capitalize(sanitizeArea(match[1]))
+  if (!area || area.length < 2) throw new ValidationError('Please provide a valid area name.')
+
+  const phone = reportedBy.replace('@s.whatsapp.net', '').replace('@lid', '')
+  const success = await subscriptionService.unsubscribe(phone, area)
+
+  if (!success) return `⚠️ You are not subscribed to *${area}* alerts.`
+
+  return `🔕 *Unsubscribed from ${area}.*\nYou will no longer receive alerts for this area.`
+}
+
+/**
+ * Handle view my subscriptions
+ */
+const handleMySubscriptions = async (text, reportedBy) => {
+  const match = text.match(/(?:my\s+subscriptions|my\s+alerts|show\s+my\s+alerts|what\s+am\s+i\s+subscribed\s+to)/i)
+  if (!match) return null
+
+  const phone = reportedBy.replace('@s.whatsapp.net', '').replace('@lid', '')
+  const subscriptions = await subscriptionService.getSubscriptions(phone)
+
+  if (!subscriptions.length) {
+    return `📭 You have no active subscriptions.\n\nSend *subscribe [area]* to get alerts for any area.\nExample: *subscribe Yaba*`
+  }
+
+  const areas = subscriptions.map((s) => `🔔 ${s.area}`).join('\n')
+  return `📋 *Your Active Subscriptions:*\n\n${areas}\n\nSend *unsubscribe [area]* to stop alerts for any area.`
+}
+
+/**
  * Handle show all active reports
  */
 const handleShowAllReports = async (text) => {
@@ -294,6 +374,9 @@ const handleMessage = async (text, reportedBy) => {
     const normalizedText = text.trim().toLowerCase()
 
     const result =
+      (await handleSubscribe(normalizedText, reportedBy)) ||
+      (await handleUnsubscribe(normalizedText, reportedBy)) ||
+      (await handleMySubscriptions(normalizedText, reportedBy)) ||
       (await handleNoLightReport(normalizedText, reportedBy)) ||
       (await handleLightBackReport(normalizedText, reportedBy)) ||
       (await handleAreaCheck(normalizedText)) ||
@@ -303,7 +386,6 @@ const handleMessage = async (text, reportedBy) => {
     return result
   } catch (error) {
     logger.error('Error handling message:', error)
-
     if (error.isOperational) return `⚠️ ${error.message}`
     return MESSAGES.ERROR
   }

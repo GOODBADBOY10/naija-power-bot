@@ -1,9 +1,10 @@
 'use strict'
 
 const { Report, STATUSES } = require('../models/Report')
-const { DatabaseError, NotFoundError } = require('../utils/errors')
+const { DatabaseError } = require('../utils/errors')
 const { getExpiryDate } = require('../utils/helpers')
 const { reportExpiryHours } = require('../config/env')
+const { sendLightBackAlerts, sendNoLightAlerts } = require('./alertService')
 const logger = require('../utils/logger')
 
 /**
@@ -25,6 +26,18 @@ const createReport = async (area, status, reportedBy = 'anonymous') => {
     })
 
     logger.info(`📝 New report created — Area: ${area}, Status: ${status}`)
+
+    // Trigger alerts to subscribers
+    if (status === STATUSES.LIGHT_BACK) {
+      sendLightBackAlerts(area).catch((err) =>
+        logger.error('Error sending light back alerts:', err)
+      )
+    } else if (status === STATUSES.NO_LIGHT) {
+      sendNoLightAlerts(area).catch((err) =>
+        logger.error('Error sending no light alerts:', err)
+      )
+    }
+
     return report
   } catch (error) {
     logger.error('Error creating report:', error)
