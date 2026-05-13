@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Naija Power Bot — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface2: #1a1a1a;
+      --border: #2a2a2a;
+      --green: #00ff88;
+      --green-dim: #00ff8822;
+      --red: #ff4444;
+      --red-dim: #ff444422;
+      --yellow: #ffcc00;
+      --yellow-dim: #ffcc0022;
+      --text: #f0f0f0;
+      --text-muted: #666;
+      --text-dim: #999;
+      --font-mono: 'Space Mono', monospace;
+      --font-display: 'Syne', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-display);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── LOGIN SCREEN ── */
+    #login-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .login-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 3rem;
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+    }
+
+    .login-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--green);
+    }
+
+    .login-logo {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.25rem;
+      letter-spacing: -1px;
+    }
+
+    .login-logo span { color: var(--green); }
+
+    .login-sub {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .login-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .login-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      padding: 0.75rem 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 1.5rem;
+    }
+
+    .login-input:focus { border-color: var(--green); }
+
+    .login-btn {
+      width: 100%;
+      background: var(--green);
+      color: #000;
+      border: none;
+      padding: 0.85rem;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transition: opacity 0.2s;
+    }
+
+    .login-btn:hover { opacity: 0.85; }
+
+    .login-error {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--red);
+      margin-top: 1rem;
+      display: none;
+    }
+
+    /* ── MAIN DASHBOARD ── */
+    #dashboard { display: none; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 100;
+    }
+
+    .topbar-logo {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .topbar-logo span { color: var(--green); }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .bot-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot.offline { background: var(--red); animation: none; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .refresh-btn {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.75rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+
+    .refresh-btn:hover { border-color: var(--green); color: var(--green); }
+
+    .last-updated {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    .main {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ── OVERVIEW CARDS ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--surface);
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 2px;
+      background: var(--green);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+
+    .card:hover::after { transform: scaleX(1); }
+
+    .card-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -2px;
+    }
+
+    .card-value.green { color: var(--green); }
+    .card-value.red { color: var(--red); }
+    .card-value.yellow { color: var(--yellow); }
+
+    .card-sub {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    /* ── SECTION ── */
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--text-dim);
+    }
+
+    .section-badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 0.2rem 0.6rem;
+      color: var(--text-muted);
+    }
+
+    /* ── TWO COL ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── CHART BOX ── */
+    .chart-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .chart-box canvas { max-height: 260px; }
+
+    /* ── TABLE ── */
+    .table-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+
+    td {
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 0.2rem 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .status-badge.no-light {
+      background: var(--red-dim);
+      color: var(--red);
+      border: 1px solid var(--red);
+    }
+
+    .status-badge.light-back {
+      background: var(--green-dim);
+      color: var(--green);
+      border: 1px solid var(--green);
+    }
+
+    .bar-cell { min-width: 120px; }
+
+    .bar {
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 0;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--green);
+      transition: width 0.6s ease;
+    }
+
+    .bar-fill.red { background: var(--red); }
+
+    /* ── TOP AREAS ── */
+    .top-areas {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .top-area-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      transition: background 0.15s;
+    }
+
+    .top-area-item:last-child { border-bottom: none; }
+    .top-area-item:hover { background: var(--surface2); }
+
+    .top-area-rank {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      width: 24px;
+      flex-shrink: 0;
+    }
+
+    .top-area-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      flex: 1;
+    }
+
+    .top-area-count {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    .top-area-bar {
+      width: 80px;
+      height: 4px;
+      background: var(--surface2);
+    }
+
+    .top-area-bar-fill {
+      height: 100%;
+      background: var(--red);
+    }
+
+    /* ── LOADING ── */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      gap: 1rem;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── EMPTY STATE ── */
+    .empty {
+      padding: 3rem;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* ── UPTIME ── */
+    .uptime-bar {
+      display: flex;
+      gap: 2px;
+      margin-top: 0.5rem;
+    }
+
+    .uptime-seg {
+      height: 20px;
+      flex: 1;
+      background: var(--green);
+      opacity: 0.7;
+    }
+
+    /* ── FADE IN ── */
+    .fade-in {
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">⚡ Naija<span>Power</span></div>
+    <div class="login-sub">Bot Dashboard — Restricted Access</div>
+    <label class="login-label">Password</label>
+    <input type="password" class="login-input" id="password-input" placeholder="Enter password" />
+    <button class="login-btn" onclick="login()">Access Dashboard</button>
+    <div class="login-error" id="login-error">❌ Wrong password. Try again.</div>
+  </div>
+</div>
+
+<!-- ── DASHBOARD ── -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="topbar-logo">⚡ Naija<span>Power</span> <span style="color:var(--text-muted);font-weight:400;font-size:0.9rem">Dashboard</span></div>
+    <div class="topbar-right">
+      <div class="bot-status">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Online</span>
+      </div>
+      <div class="last-updated" id="last-updated">—</div>
+      <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div class="main" id="main-content">
+    <div class="loading"><div class="spinner"></div> Loading data...</div>
+  </div>
+</div>
+
+<script>
+  let token = ''
+  let charts = {}
+
+  // ── LOGIN ──
+  function login() {
+    const pw = document.getElementById('password-input').value
+    if (!pw) return
+    token = pw
+    loadDashboard()
+  }
+
+  document.getElementById('password-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') login()
+  })
+
+  // ── FETCH DATA ──
+  async function loadDashboard() {
+    try {
+      const res = await fetch(`/api/dashboard?token=${encodeURIComponent(token)}`)
+      if (res.status === 401) {
+        document.getElementById('login-error').style.display = 'block'
+        return
+      }
+
+      const data = await res.json()
+
+      // Show dashboard
+      document.getElementById('login-screen').style.display = 'none'
+      document.getElementById('dashboard').style.display = 'block'
+
+      renderDashboard(data)
+
+      document.getElementById('last-updated').textContent =
+        'Updated: ' + new Date().toLocaleTimeString('en-NG')
+
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  // ── RENDER ──
+  function renderDashboard(data) {
+    const { overview, activeReports, areaBreakdown, topAffectedAreas, reportTrends, peakHours, avgOutageDuration, topSubscribedAreas } = data
+
+    // Bot uptime
+    const uptimeHrs = (overview.botUptime / 3600).toFixed(1)
+    const statusDot = document.getElementById('status-dot')
+    const statusText = document.getElementById('status-text')
+    statusDot.className = 'status-dot'
+    statusText.textContent = `Online — ${uptimeHrs}h uptime`
+
+    const html = `
+      <!-- OVERVIEW CARDS -->
+      <div class="cards-grid fade-in">
+        <div class="card">
+          <div class="card-label">Active Reports</div>
+          <div class="card-value ${overview.activeReports > 0 ? 'red' : 'green'}">${overview.activeReports}</div>
+          <div class="card-sub">right now</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Reports (24h)</div>
+          <div class="card-value yellow">${overview.reportsLast24h}</div>
+          <div class="card-sub">last 24 hours</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Reports (7d)</div>
+          <div class="card-value">${overview.reportsLast7days}</div>
+          <div class="card-sub">last 7 days</div>
+        </div>
+        <div class="card">
+          <div class="card-label">No Light (7d)</div>
+          <div class="card-value red">${overview.noLightLast7days}</div>
+          <div class="card-sub">outage reports</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Subscribers</div>
+          <div class="card-value green">${overview.totalSubscribers}</div>
+          <div class="card-sub">${overview.uniqueSubscribers} unique users</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Bot Uptime</div>
+          <div class="card-value">${uptimeHrs}<span style="font-size:1rem;color:var(--text-muted)">h</span></div>
+          <div class="card-sub">since last restart</div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="two-col fade-in">
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">Report Trends — Last 7 Days</div>
+          </div>
+          <div class="chart-box">
+            <canvas id="trendsChart"></canvas>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">Peak Hours</div>
+          </div>
+          <div class="chart-box">
+            <canvas id="peakChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVE REPORTS TABLE -->
+      <div class="section fade-in">
+        <div class="section-header">
+          <div class="section-title">Active Reports</div>
+          <div class="section-badge">${activeReports.length} active</div>
+        </div>
+        ${renderActiveReportsTable(activeReports)}
+      </div>
+
+      <!-- TWO COL: TOP AREAS + OUTAGE DURATION -->
+      <div class="two-col fade-in">
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">🏆 Most Affected Areas (7d)</div>
+            <div class="section-badge">Top 10</div>
+          </div>
+          <div class="top-areas table-box">
+            ${renderTopAreas(topAffectedAreas)}
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">⏱ Current Outage Durations</div>
+            <div class="section-badge">${avgOutageDuration.length} areas</div>
+          </div>
+          <div class="table-box">
+            ${renderOutageDurations(avgOutageDuration)}
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP SUBSCRIBED AREAS -->
+      <div class="section fade-in">
+        <div class="section-header">
+          <div class="section-title">🔔 Most Subscribed Areas</div>
+          <div class="section-badge">Top 10</div>
+        </div>
+        <div class="table-box">
+          ${renderSubscribedAreas(topSubscribedAreas)}
+        </div>
+      </div>
+    `
+
+    document.getElementById('main-content').innerHTML = html
+
+    // Render charts
+    renderTrendsChart(reportTrends)
+    renderPeakChart(peakHours)
+  }
+
+  function renderActiveReportsTable(reports) {
+    if (!reports.length) return `<div class="empty">No active reports right now</div>`
+    return `
+      <div class="table-box">
+        <table>
+          <thead>
+            <tr>
+              <th>Area</th>
+              <th>Status</th>
+              <th>Reported By</th>
+              <th>Reported</th>
+              <th>Without Light</th>
+              <th>Expires</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${reports.slice(0, 20).map(r => `
+              <tr>
+                <td><strong>${r.area}</strong></td>
+                <td>
+                  <span class="status-badge ${r.status === 'no light' ? 'no-light' : 'light-back'}">
+                    ${r.status === 'no light' ? '❌ No Light' : '✅ Light Back'}
+                  </span>
+                </td>
+                <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted)">${r.reportedBy || 'anonymous'}</td>
+                <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted)">${timeAgo(r.createdAt)}</td>
+                <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--red)">
+                  ${r.status === 'no light' && r.firstReportedAt ? outDuration(r.firstReportedAt) : '—'}
+                </td>
+                <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted)">${timeAgo(r.expiresAt)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `
+  }
+
+  function renderTopAreas(areas) {
+    if (!areas.length) return `<div class="empty">No data yet</div>`
+    const max = areas[0].count
+    return areas.map((a, i) => `
+      <div class="top-area-item">
+        <div class="top-area-rank">#${i + 1}</div>
+        <div class="top-area-name">${a._id}</div>
+        <div class="top-area-bar">
+          <div class="top-area-bar-fill" style="width:${(a.count/max*100).toFixed(0)}%"></div>
+        </div>
+        <div class="top-area-count">${a.count}×</div>
+      </div>
+    `).join('')
+  }
+
+  function renderOutageDurations(durations) {
+    if (!durations.length) return `<div class="empty">No active outages</div>`
+    const max = Math.max(...durations.map(d => d.durationMs))
+    return `
+      <table>
+        <thead>
+          <tr><th>Area</th><th>Duration</th><th>Since</th></tr>
+        </thead>
+        <tbody>
+          ${durations.sort((a,b) => b.durationMs - a.durationMs).map(d => `
+            <tr>
+              <td><strong>${d.area}</strong></td>
+              <td>
+                <span style="color:var(--red);font-family:var(--font-mono);font-size:0.8rem;font-weight:700">${d.durationHours}h</span>
+                <div class="bar"><div class="bar-fill red" style="width:${(d.durationMs/max*100).toFixed(0)}%"></div></div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted)">${timeAgo(new Date(Date.now() - d.durationMs).toISOString())}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `
+  }
+
+  function renderSubscribedAreas(areas) {
+    if (!areas.length) return `<div class="empty">No subscriptions yet</div>`
+    const max = areas[0].count
+    return `
+      <table>
+        <thead>
+          <tr><th>#</th><th>Area</th><th>Subscribers</th><th>Share</th></tr>
+        </thead>
+        <tbody>
+          ${areas.map((a, i) => `
+            <tr>
+              <td style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted)">${i+1}</td>
+              <td><strong>${a._id}</strong></td>
+              <td style="font-family:var(--font-mono);font-size:0.8rem;color:var(--green)">${a.count}</td>
+              <td class="bar-cell">
+                <div class="bar"><div class="bar-fill" style="width:${(a.count/max*100).toFixed(0)}%"></div></div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `
+  }
+
+  // ── CHARTS ──
+  function renderTrendsChart(trends) {
+    const days = []
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      days.push(d.toISOString().split('T')[0])
+    }
+
+    const noLight = days.map(day => {
+      const found = trends.find(t => t._id.date === day && t._id.status === 'no light')
+      return found ? found.count : 0
+    })
+
+    const lightBack = days.map(day => {
+      const found = trends.find(t => t._id.date === day && t._id.status === 'light back')
+      return found ? found.count : 0
+    })
+
+    const labels = days.map(d => {
+      const date = new Date(d)
+      return date.toLocaleDateString('en-NG', { weekday: 'short', month: 'short', day: 'numeric' })
+    })
+
+    if (charts.trends) charts.trends.destroy()
+    const ctx = document.getElementById('trendsChart').getContext('2d')
+    charts.trends = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'No Light',
+            data: noLight,
+            backgroundColor: '#ff444444',
+            borderColor: '#ff4444',
+            borderWidth: 1,
+          },
+          {
+            label: 'Light Back',
+            data: lightBack,
+            backgroundColor: '#00ff8822',
+            borderColor: '#00ff88',
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: '#666', font: { family: 'Space Mono', size: 10 } } },
+        },
+        scales: {
+          x: { ticks: { color: '#666', font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a1a1a' } },
+          y: { ticks: { color: '#666', font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a1a1a' }, beginAtZero: true },
+        },
+      },
+    })
+  }
+
+  function renderPeakChart(peakHours) {
+    const hours = Array.from({ length: 24 }, (_, i) => i)
+    const counts = hours.map(h => {
+      const found = peakHours.find(p => p._id === h)
+      return found ? found.count : 0
+    })
+    const labels = hours.map(h => `${h}:00`)
+
+    if (charts.peak) charts.peak.destroy()
+    const ctx = document.getElementById('peakChart').getContext('2d')
+    charts.peak = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Reports',
+          data: counts,
+          borderColor: '#ffcc00',
+          backgroundColor: '#ffcc0011',
+          borderWidth: 1.5,
+          pointRadius: 2,
+          fill: true,
+          tension: 0.4,
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: '#666', font: { family: 'Space Mono', size: 10 } } },
+        },
+        scales: {
+          x: { ticks: { color: '#666', font: { family: 'Space Mono', size: 8 }, maxRotation: 45 }, grid: { color: '#1a1a1a' } },
+          y: { ticks: { color: '#666', font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a1a1a' }, beginAtZero: true },
+        },
+      },
+    })
+  }
+
+  // ── HELPERS ──
+  function timeAgo(dateStr) {
+    const diff = Date.now() - new Date(dateStr)
+    const mins = Math.floor(diff / 60000)
+    if (mins < 1) return 'just now'
+    if (mins < 60) return `${mins}m ago`
+    const hrs = Math.floor(mins / 60)
+    if (hrs < 24) return `${hrs}h ago`
+    return `${Math.floor(hrs/24)}d ago`
+  }
+
+  function outDuration(dateStr) {
+    const diff = Date.now() - new Date(dateStr)
+    const hrs = Math.floor(diff / 3600000)
+    const mins = Math.floor((diff % 3600000) / 60000)
+    if (hrs === 0) return `${mins}m`
+    if (mins === 0) return `${hrs}h`
+    return `${hrs}h ${mins}m`
+  }
+
+  // ── AUTO REFRESH every 30s ──
+  setInterval(() => {
+    if (document.getElementById('dashboard').style.display !== 'none') {
+      loadDashboard()
+    }
+  }, 30000)
+</script>
+</body>
+</html>
