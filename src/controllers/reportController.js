@@ -86,6 +86,8 @@ Thank you for keeping Nigeria powered! 🇳🇬`,
   NO_ACTIVE_REPORTS: `📭 No active reports at the moment.\n\nBe the first to report your area's power situation!`,
 
   ERROR: `⚠️ Something went wrong. Please try again in a moment.`,
+
+  UNKNOWN: `🤔 I no understand that message.\n\nTry something like:\n• *no light - Yaba* — to report outage\n• *light back - Ikeja* — to report power restored\n• *any light in Surulere?* — to check an area\n• *subscribe Yaba* — to get alerts\n\nSend *help* to see all commands.`,
 }
 
 /**
@@ -110,6 +112,17 @@ const handleNoLightReport = async (text, reportedBy) => {
     /darkness\s+(?:for|in|at)?\s*(.+)/i,
     /no\s+power\s+(?:for|in|at)?\s*(.+)/i,
     /blackout\s+(?:for|in|at)?\s*(.+)/i,
+    /nepa\s+took\s+(?:light\s+)?(?:for)?\s*(.+)/i,        // Nepa took light for Ojo
+    /phcn\s+took\s+(?:light\s+)?(?:for)?\s*(.+)/i,        // PHCN took light for Ojo
+    /they\s+took\s+(?:light\s+)?(?:in|at|for)?\s*(.+)/i,  // they took light in Ojo
+    /no\s+fuel\s+(?:for|in|at)?\s*(.+)/i,                 // no fuel for Ojo (generator context)
+    /gen\s+don\s+off\s+(?:for)?\s*(.+)/i,                 // gen don off for Ojo
+    /generator\s+off\s+(?:for|in|at)?\s*(.+)/i,           // generator off in Ojo
+    /light\s+never\s+show\s+(?:for|in|at)?\s*(.+)/i,      // light never show for Ojo
+    /since\s+yesterday\s+no\s+light\s+(?:for)?\s*(.+)/i,  // since yesterday no light for Ojo
+    /no\s+light\s+since\s+(?:for|in|at)?\s*(.+)/i,        // no light since for Ojo
+    /dem\s+cut\s+(?:light\s+)?(?:for|in|at)?\s*(.+)/i,    // dem cut light for Ojo
+    /they\s+cut\s+(?:light\s+)?(?:for|in|at)?\s*(.+)/i,   // they cut light for Ojo
   ]
 
   // Area at the FRONT patterns
@@ -125,6 +138,11 @@ const handleNoLightReport = async (text, reportedBy) => {
     /^(.+?)\s+blackout/i,                          // Yaba blackout
     /^(.+?)\s+power\s+outage/i,                    // Yaba power outage
     /^(.+?)\s+light\s+never\s+come/i,             // Yaba light never come
+    /^(.+?)\s+nepa\s+took/i,          // Ojo nepa took light
+    /^(.+?)\s+dem\s+cut\s+light/i,    // Ojo dem cut light
+    /^(.+?)\s+no\s+power\s+since/i,   // Ojo no power since
+    /^(.+?)\s+gen\s+don\s+off/i,      // Ojo gen don off
+    /^(.+?)\s+still\s+no\s+light/i,   // Ojo still no light
   ]
 
   // Check end patterns first
@@ -172,6 +190,11 @@ const handleLightBackReport = async (text, reportedBy) => {
     /current\s+don\s+come\s+(?:for)?\s*(.+)/i,
     /light\s+don\s+show\s+(?:for)?\s*(.+)/i,
     /nepa\s+(?:don\s+)?restore\s+(?:light\s+)?(?:for)?\s*(.+)/i,
+    /nepa\s+brought\s+(?:light\s+)?(?:for|back\s+to)?\s*(.+)/i,  // nepa brought light for Ojo
+    /they\s+brought\s+(?:light\s+)?(?:for|to)?\s*(.+)/i,          // they brought light for Ojo
+    /light\s+don\s+enter\s+(?:for)?\s*(.+)/i,                     // light don enter for Ojo
+    /current\s+don\s+enter\s+(?:for)?\s*(.+)/i,                   // current don enter for Ojo
+    /nepa\s+don\s+bring\s+(?:light\s+)?(?:for)?\s*(.+)/i,         // nepa don bring light for Ojo
   ]
 
   // Area at the FRONT patterns
@@ -186,6 +209,10 @@ const handleLightBackReport = async (text, reportedBy) => {
     /^(.+?)\s+electricity\s+(?:is\s+)?back/i,      // Yaba electricity is back
     /^(.+?)\s+light\s+don\s+return/i,             // Yaba light don return
     /^(.+?)\s+nepa\s+bring\s+light/i,             // Yaba nepa bring light
+    /^(.+?)\s+light\s+don\s+enter/i,   // Ojo light don enter
+    /^(.+?)\s+current\s+don\s+enter/i, // Ojo current don enter
+    /^(.+?)\s+nepa\s+bring\s+light/i,  // already there — keep
+    /^(.+?)\s+light\s+don\s+come/i,    // Ojo light don come
   ]
 
   // Check end patterns first
@@ -262,7 +289,7 @@ const handleAreaCheck = async (text) => {
       if (area.length > 50) throw new ValidationError('Area name is too long. Please be more specific.')
       const report = await reportService.getLatestReport(area)
       if (!report) return MESSAGES.NO_REPORT_FOUND(area)
-        return MESSAGES.STATUS_RESPONSE(area, report.status, getTimeAgo(report.createdAt), report.firstReportedAt)
+      return MESSAGES.STATUS_RESPONSE(area, report.status, getTimeAgo(report.createdAt), report.firstReportedAt)
     }
   }
 
@@ -275,7 +302,7 @@ const handleAreaCheck = async (text) => {
       if (area.length > 50) throw new ValidationError('Area name is too long. Please be more specific.')
       const report = await reportService.getLatestReport(area)
       if (!report) return MESSAGES.NO_REPORT_FOUND(area)
-        return MESSAGES.STATUS_RESPONSE(area, report.status, getTimeAgo(report.createdAt), report.firstReportedAt)
+      return MESSAGES.STATUS_RESPONSE(area, report.status, getTimeAgo(report.createdAt), report.firstReportedAt)
     }
   }
 
@@ -348,6 +375,15 @@ const handleMySubscriptions = async (text, reportedBy) => {
 }
 
 /**
+ * Handle help/greeting messages
+ */
+const handleHelp = async (text) => {
+  const match = text.match(/^(?:help|commands|how|start|hi|hello|hey|menu|info|yoo|guy)$/i)
+  if (!match) return null
+  return MESSAGES.HELP
+}
+
+/**
  * Handle show all active reports
  */
 const handleShowAllReports = async (text) => {
@@ -384,8 +420,8 @@ const handleMessage = async (text, reportedBy) => {
       (await handleLightBackReport(normalizedText, reportedBy)) ||
       (await handleAreaCheck(normalizedText)) ||
       (await handleShowAllReports(normalizedText)) ||
-      MESSAGES.HELP
-
+      (await handleHelp(normalizedText)) ||
+      MESSAGES.UNKNOWN
     return result
   } catch (error) {
     logger.error('Error handling message:', error)
