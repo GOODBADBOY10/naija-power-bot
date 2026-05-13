@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Naija Power Bot — Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap"
+    rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     :root {
@@ -25,7 +28,11 @@
       --font-display: 'Syne', sans-serif;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
       background: var(--bg);
@@ -60,7 +67,9 @@
     .login-box::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0;
+      top: 0;
+      left: 0;
+      right: 0;
       height: 2px;
       background: var(--green);
     }
@@ -72,7 +81,9 @@
       letter-spacing: -1px;
     }
 
-    .login-logo span { color: var(--green); }
+    .login-logo span {
+      color: var(--green);
+    }
 
     .login-sub {
       font-family: var(--font-mono);
@@ -106,7 +117,9 @@
       margin-bottom: 1.5rem;
     }
 
-    .login-input:focus { border-color: var(--green); }
+    .login-input:focus {
+      border-color: var(--green);
+    }
 
     .login-btn {
       width: 100%;
@@ -123,7 +136,9 @@
       transition: opacity 0.2s;
     }
 
-    .login-btn:hover { opacity: 0.85; }
+    .login-btn:hover {
+      opacity: 0.85;
+    }
 
     .login-error {
       font-family: var(--font-mono);
@@ -134,7 +149,9 @@
     }
 
     /* ── MAIN DASHBOARD ── */
-    #dashboard { display: none; }
+    #dashboard {
+      display: none;
+    }
 
     .topbar {
       display: flex;
@@ -154,7 +171,9 @@
       letter-spacing: -0.5px;
     }
 
-    .topbar-logo span { color: var(--green); }
+    .topbar-logo span {
+      color: var(--green);
+    }
 
     .topbar-right {
       display: flex;
@@ -181,11 +200,21 @@
       animation: pulse 2s infinite;
     }
 
-    .status-dot.offline { background: var(--red); animation: none; }
+    .status-dot.offline {
+      background: var(--red);
+      animation: none;
+    }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
     }
 
     .refresh-btn {
@@ -201,7 +230,10 @@
       transition: all 0.2s;
     }
 
-    .refresh-btn:hover { border-color: var(--green); color: var(--green); }
+    .refresh-btn:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
 
     .last-updated {
       font-family: var(--font-mono);
@@ -235,15 +267,19 @@
     .card::after {
       content: '';
       position: absolute;
-      bottom: 0; left: 0;
-      width: 100%; height: 2px;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
       background: var(--green);
       transform: scaleX(0);
       transform-origin: left;
       transition: transform 0.4s ease;
     }
 
-    .card:hover::after { transform: scaleX(1); }
+    .card:hover::after {
+      transform: scaleX(1);
+    }
 
     .card-label {
       font-family: var(--font-mono);
@@ -261,9 +297,17 @@
       letter-spacing: -2px;
     }
 
-    .card-value.green { color: var(--green); }
-    .card-value.red { color: var(--red); }
-    .card-value.yellow { color: var(--yellow); }
+    .card-value.green {
+      color: var(--green);
+    }
+
+    .card-value.red {
+      color: var(--red);
+    }
+
+    .card-value.yellow {
+      color: var(--yellow);
+    }
 
     .card-sub {
       font-family: var(--font-mono);
@@ -310,7 +354,11 @@
       gap: 1.5rem;
     }
 
-    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
 
     /* ── CHART BOX ── */
     .chart-box {
@@ -320,7 +368,9 @@
       position: relative;
     }
 
-    .chart-box canvas { max-height: 260px; }
+    .chart-box canvas {
+      max-height: 260px;
+    }
 
     /* ── TABLE ── */
     .table-box {
@@ -354,8 +404,13 @@
       transition: background 0.15s;
     }
 
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: var(--surface2); }
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: var(--surface2);
+    }
 
     td {
       padding: 0.75rem 1rem;
@@ -385,7 +440,9 @@
       border: 1px solid var(--green);
     }
 
-    .bar-cell { min-width: 120px; }
+    .bar-cell {
+      min-width: 120px;
+    }
 
     .bar {
       height: 6px;
@@ -401,7 +458,9 @@
       transition: width 0.6s ease;
     }
 
-    .bar-fill.red { background: var(--red); }
+    .bar-fill.red {
+      background: var(--red);
+    }
 
     /* ── TOP AREAS ── */
     .top-areas {
@@ -420,8 +479,13 @@
       transition: background 0.15s;
     }
 
-    .top-area-item:last-child { border-bottom: none; }
-    .top-area-item:hover { background: var(--surface2); }
+    .top-area-item:last-child {
+      border-bottom: none;
+    }
+
+    .top-area-item:hover {
+      background: var(--surface2);
+    }
 
     .top-area-rank {
       font-family: var(--font-mono);
@@ -478,7 +542,11 @@
       animation: spin 0.8s linear infinite;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
     /* ── EMPTY STATE ── */
     .empty {
@@ -511,102 +579,121 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* scrollbar */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border); }
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+    }
   </style>
 </head>
+
 <body>
 
-<!-- ── LOGIN ── -->
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">⚡ Naija<span>Power</span></div>
-    <div class="login-sub">Bot Dashboard — Restricted Access</div>
-    <label class="login-label">Password</label>
-    <input type="password" class="login-input" id="password-input" placeholder="Enter password" />
-    <button class="login-btn" onclick="login()">Access Dashboard</button>
-    <div class="login-error" id="login-error">❌ Wrong password. Try again.</div>
-  </div>
-</div>
-
-<!-- ── DASHBOARD ── -->
-<div id="dashboard">
-  <div class="topbar">
-    <div class="topbar-logo">⚡ Naija<span>Power</span> <span style="color:var(--text-muted);font-weight:400;font-size:0.9rem">Dashboard</span></div>
-    <div class="topbar-right">
-      <div class="bot-status">
-        <div class="status-dot" id="status-dot"></div>
-        <span id="status-text">Online</span>
-      </div>
-      <div class="last-updated" id="last-updated">—</div>
-      <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
+  <!-- ── LOGIN ── -->
+  <div id="login-screen">
+    <div class="login-box">
+      <div class="login-logo">⚡ Naija<span>Power</span></div>
+      <div class="login-sub">Bot Dashboard — Restricted Access</div>
+      <label class="login-label">Password</label>
+      <input type="password" class="login-input" id="password-input" placeholder="Enter password" />
+      <button class="login-btn" onclick="login()">Access Dashboard</button>
+      <div class="login-error" id="login-error">❌ Wrong password. Try again.</div>
     </div>
   </div>
 
-  <div class="main" id="main-content">
-    <div class="loading"><div class="spinner"></div> Loading data...</div>
+  <!-- ── DASHBOARD ── -->
+  <div id="dashboard">
+    <div class="topbar">
+      <div class="topbar-logo">⚡ Naija<span>Power</span> <span
+          style="color:var(--text-muted);font-weight:400;font-size:0.9rem">Dashboard</span></div>
+      <div class="topbar-right">
+        <div class="bot-status">
+          <div class="status-dot" id="status-dot"></div>
+          <span id="status-text">Online</span>
+        </div>
+        <div class="last-updated" id="last-updated">—</div>
+        <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
+      </div>
+    </div>
+
+    <div class="main" id="main-content">
+      <div class="loading">
+        <div class="spinner"></div> Loading data...
+      </div>
+    </div>
   </div>
-</div>
 
-<script>
-  let token = ''
-  let charts = {}
+  <script>
+    let token = ''
+    let charts = {}
 
-  // ── LOGIN ──
-  function login() {
-    const pw = document.getElementById('password-input').value
-    if (!pw) return
-    token = pw
-    loadDashboard()
-  }
-
-  document.getElementById('password-input').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') login()
-  })
-
-  // ── FETCH DATA ──
-  async function loadDashboard() {
-    try {
-      const res = await fetch(`/api/dashboard?token=${encodeURIComponent(token)}`)
-      if (res.status === 401) {
-        document.getElementById('login-error').style.display = 'block'
-        return
-      }
-
-      const data = await res.json()
-
-      // Show dashboard
-      document.getElementById('login-screen').style.display = 'none'
-      document.getElementById('dashboard').style.display = 'block'
-
-      renderDashboard(data)
-
-      document.getElementById('last-updated').textContent =
-        'Updated: ' + new Date().toLocaleTimeString('en-NG')
-
-    } catch (err) {
-      console.error(err)
+    // ── LOGIN ──
+    function login() {
+      const pw = document.getElementById('password-input').value
+      if (!pw) return
+      token = pw
+      loadDashboard()
     }
-  }
 
-  // ── RENDER ──
-  function renderDashboard(data) {
-    const { overview, activeReports, areaBreakdown, topAffectedAreas, reportTrends, peakHours, avgOutageDuration, topSubscribedAreas } = data
+    document.getElementById('password-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') login()
+    })
 
-    // Bot uptime
-    const uptimeHrs = (overview.botUptime / 3600).toFixed(1)
-    const statusDot = document.getElementById('status-dot')
-    const statusText = document.getElementById('status-text')
-    statusDot.className = 'status-dot'
-    statusText.textContent = `Online — ${uptimeHrs}h uptime`
+    // ── FETCH DATA ──
+    async function loadDashboard() {
+      try {
+        const res = await fetch(`/api/dashboard?token=${encodeURIComponent(token)}`)
+        if (res.status === 401) {
+          document.getElementById('login-error').style.display = 'block'
+          return
+        }
 
-    const html = `
+        const data = await res.json()
+
+        // Show dashboard
+        document.getElementById('login-screen').style.display = 'none'
+        document.getElementById('dashboard').style.display = 'block'
+
+        renderDashboard(data)
+
+        document.getElementById('last-updated').textContent =
+          'Updated: ' + new Date().toLocaleTimeString('en-NG')
+
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    // ── RENDER ──
+    function renderDashboard(data) {
+      const { overview, activeReports, areaBreakdown, topAffectedAreas, reportTrends, peakHours, avgOutageDuration, topSubscribedAreas } = data
+
+      // Bot uptime
+      const uptimeHrs = (overview.botUptime / 3600).toFixed(1)
+      const statusDot = document.getElementById('status-dot')
+      const statusText = document.getElementById('status-text')
+      statusDot.className = 'status-dot'
+      statusText.textContent = `Online — ${uptimeHrs}h uptime`
+
+      const html = `
       <!-- OVERVIEW CARDS -->
       <div class="cards-grid fade-in">
         <div class="card">
@@ -704,16 +791,16 @@
       </div>
     `
 
-    document.getElementById('main-content').innerHTML = html
+      document.getElementById('main-content').innerHTML = html
 
-    // Render charts
-    renderTrendsChart(reportTrends)
-    renderPeakChart(peakHours)
-  }
+      // Render charts
+      renderTrendsChart(reportTrends)
+      renderPeakChart(peakHours)
+    }
 
-  function renderActiveReportsTable(reports) {
-    if (!reports.length) return `<div class="empty">No active reports right now</div>`
-    return `
+    function renderActiveReportsTable(reports) {
+      if (!reports.length) return `<div class="empty">No active reports right now</div>`
+      return `
       <div class="table-box">
         <table>
           <thead>
@@ -747,38 +834,38 @@
         </table>
       </div>
     `
-  }
+    }
 
-  function renderTopAreas(areas) {
-    if (!areas.length) return `<div class="empty">No data yet</div>`
-    const max = areas[0].count
-    return areas.map((a, i) => `
+    function renderTopAreas(areas) {
+      if (!areas.length) return `<div class="empty">No data yet</div>`
+      const max = areas[0].count
+      return areas.map((a, i) => `
       <div class="top-area-item">
         <div class="top-area-rank">#${i + 1}</div>
         <div class="top-area-name">${a._id}</div>
         <div class="top-area-bar">
-          <div class="top-area-bar-fill" style="width:${(a.count/max*100).toFixed(0)}%"></div>
+          <div class="top-area-bar-fill" style="width:${(a.count / max * 100).toFixed(0)}%"></div>
         </div>
         <div class="top-area-count">${a.count}×</div>
       </div>
     `).join('')
-  }
+    }
 
-  function renderOutageDurations(durations) {
-    if (!durations.length) return `<div class="empty">No active outages</div>`
-    const max = Math.max(...durations.map(d => d.durationMs))
-    return `
+    function renderOutageDurations(durations) {
+      if (!durations.length) return `<div class="empty">No active outages</div>`
+      const max = Math.max(...durations.map(d => d.durationMs))
+      return `
       <table>
         <thead>
           <tr><th>Area</th><th>Duration</th><th>Since</th></tr>
         </thead>
         <tbody>
-          ${durations.sort((a,b) => b.durationMs - a.durationMs).map(d => `
+          ${durations.sort((a, b) => b.durationMs - a.durationMs).map(d => `
             <tr>
               <td><strong>${d.area}</strong></td>
               <td>
                 <span style="color:var(--red);font-family:var(--font-mono);font-size:0.8rem;font-weight:700">${d.durationHours}h</span>
-                <div class="bar"><div class="bar-fill red" style="width:${(d.durationMs/max*100).toFixed(0)}%"></div></div>
+                <div class="bar"><div class="bar-fill red" style="width:${(d.durationMs / max * 100).toFixed(0)}%"></div></div>
               </td>
               <td style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted)">${timeAgo(new Date(Date.now() - d.durationMs).toISOString())}</td>
             </tr>
@@ -786,12 +873,12 @@
         </tbody>
       </table>
     `
-  }
+    }
 
-  function renderSubscribedAreas(areas) {
-    if (!areas.length) return `<div class="empty">No subscriptions yet</div>`
-    const max = areas[0].count
-    return `
+    function renderSubscribedAreas(areas) {
+      if (!areas.length) return `<div class="empty">No subscriptions yet</div>`
+      const max = areas[0].count
+      return `
       <table>
         <thead>
           <tr><th>#</th><th>Area</th><th>Subscribers</th><th>Share</th></tr>
@@ -799,143 +886,147 @@
         <tbody>
           ${areas.map((a, i) => `
             <tr>
-              <td style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted)">${i+1}</td>
+              <td style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted)">${i + 1}</td>
               <td><strong>${a._id}</strong></td>
               <td style="font-family:var(--font-mono);font-size:0.8rem;color:var(--green)">${a.count}</td>
               <td class="bar-cell">
-                <div class="bar"><div class="bar-fill" style="width:${(a.count/max*100).toFixed(0)}%"></div></div>
+                <div class="bar"><div class="bar-fill" style="width:${(a.count / max * 100).toFixed(0)}%"></div></div>
               </td>
             </tr>
           `).join('')}
         </tbody>
       </table>
     `
-  }
-
-  // ── CHARTS ──
-  function renderTrendsChart(trends) {
-    const days = []
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date()
-      d.setDate(d.getDate() - i)
-      days.push(d.toISOString().split('T')[0])
     }
 
-    const noLight = days.map(day => {
-      const found = trends.find(t => t._id.date === day && t._id.status === 'no light')
-      return found ? found.count : 0
-    })
+    // ── CHARTS ──
+    function renderTrendsChart(trends) {
+      const days = []
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date()
+        d.setDate(d.getDate() - i)
+        days.push(d.toISOString().split('T')[0])
+      }
 
-    const lightBack = days.map(day => {
-      const found = trends.find(t => t._id.date === day && t._id.status === 'light back')
-      return found ? found.count : 0
-    })
+      const noLight = days.map(day => {
+        const found = trends.find(t => t._id.date === day && t._id.status === 'no light')
+        return found ? found.count : 0
+      })
 
-    const labels = days.map(d => {
-      const date = new Date(d)
-      return date.toLocaleDateString('en-NG', { weekday: 'short', month: 'short', day: 'numeric' })
-    })
+      const lightBack = days.map(day => {
+        const found = trends.find(t => t._id.date === day && t._id.status === 'light back')
+        return found ? found.count : 0
+      })
 
-    if (charts.trends) charts.trends.destroy()
-    const ctx = document.getElementById('trendsChart').getContext('2d')
-    charts.trends = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [
-          {
-            label: 'No Light',
-            data: noLight,
-            backgroundColor: '#ff444444',
-            borderColor: '#ff4444',
-            borderWidth: 1,
+      const labels = days.map(d => {
+        const date = new Date(d)
+        return date.toLocaleDateString('en-NG', { weekday: 'short', month: 'short', day: 'numeric' })
+      })
+
+      if (charts.trends) charts.trends.destroy()
+      const ctx = document.getElementById('trendsChart').getContext('2d')
+      charts.trends = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'No Light',
+              data: noLight,
+              backgroundColor: '#ff444444',
+              borderColor: '#ff4444',
+              borderWidth: 1,
+            },
+            {
+              label: 'Light Back',
+              data: lightBack,
+              backgroundColor: '#00ff8822',
+              borderColor: '#00ff88',
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { color: '#666', font: { family: 'Space Mono', size: 10 } } },
           },
-          {
-            label: 'Light Back',
-            data: lightBack,
-            backgroundColor: '#00ff8822',
-            borderColor: '#00ff88',
-            borderWidth: 1,
+          scales: {
+            x: { ticks: { color: '#666', font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a1a1a' } },
+            y: { ticks: { color: '#666', font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a1a1a' }, beginAtZero: true },
           },
-        ],
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { labels: { color: '#666', font: { family: 'Space Mono', size: 10 } } },
         },
-        scales: {
-          x: { ticks: { color: '#666', font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a1a1a' } },
-          y: { ticks: { color: '#666', font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a1a1a' }, beginAtZero: true },
-        },
-      },
-    })
-  }
-
-  function renderPeakChart(peakHours) {
-    const hours = Array.from({ length: 24 }, (_, i) => i)
-    const counts = hours.map(h => {
-      const found = peakHours.find(p => p._id === h)
-      return found ? found.count : 0
-    })
-    const labels = hours.map(h => `${h}:00`)
-
-    if (charts.peak) charts.peak.destroy()
-    const ctx = document.getElementById('peakChart').getContext('2d')
-    charts.peak = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Reports',
-          data: counts,
-          borderColor: '#ffcc00',
-          backgroundColor: '#ffcc0011',
-          borderWidth: 1.5,
-          pointRadius: 2,
-          fill: true,
-          tension: 0.4,
-        }],
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { labels: { color: '#666', font: { family: 'Space Mono', size: 10 } } },
-        },
-        scales: {
-          x: { ticks: { color: '#666', font: { family: 'Space Mono', size: 8 }, maxRotation: 45 }, grid: { color: '#1a1a1a' } },
-          y: { ticks: { color: '#666', font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a1a1a' }, beginAtZero: true },
-        },
-      },
-    })
-  }
-
-  // ── HELPERS ──
-  function timeAgo(dateStr) {
-    const diff = Date.now() - new Date(dateStr)
-    const mins = Math.floor(diff / 60000)
-    if (mins < 1) return 'just now'
-    if (mins < 60) return `${mins}m ago`
-    const hrs = Math.floor(mins / 60)
-    if (hrs < 24) return `${hrs}h ago`
-    return `${Math.floor(hrs/24)}d ago`
-  }
-
-  function outDuration(dateStr) {
-    const diff = Date.now() - new Date(dateStr)
-    const hrs = Math.floor(diff / 3600000)
-    const mins = Math.floor((diff % 3600000) / 60000)
-    if (hrs === 0) return `${mins}m`
-    if (mins === 0) return `${hrs}h`
-    return `${hrs}h ${mins}m`
-  }
-
-  // ── AUTO REFRESH every 30s ──
-  setInterval(() => {
-    if (document.getElementById('dashboard').style.display !== 'none') {
-      loadDashboard()
+      })
     }
-  }, 30000)
-</script>
+
+    function renderPeakChart(peakHours) {
+      const hours = Array.from({ length: 24 }, (_, i) => i)
+      const counts = hours.map(h => {
+        const found = peakHours.find(p => p._id === h)
+        return found ? found.count : 0
+      })
+      const labels = hours.map(h => `${h}:00`)
+
+      if (charts.peak) charts.peak.destroy()
+      const ctx = document.getElementById('peakChart').getContext('2d')
+      charts.peak = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Reports',
+            data: counts,
+            borderColor: '#ffcc00',
+            backgroundColor: '#ffcc0011',
+            borderWidth: 1.5,
+            pointRadius: 2,
+            fill: true,
+            tension: 0.4,
+          }],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { color: '#666', font: { family: 'Space Mono', size: 10 } } },
+          },
+          scales: {
+            x: { ticks: { color: '#666', font: { family: 'Space Mono', size: 8 }, maxRotation: 45 }, grid: { color: '#1a1a1a' } },
+            y: { ticks: { color: '#666', font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a1a1a' }, beginAtZero: true },
+          },
+        },
+      })
+    }
+
+    // ── HELPERS ──
+    function timeAgo(dateStr) {
+      const diff = Date.now() - new Date(dateStr)
+      const mins = Math.floor(diff / 60000)
+      if (mins < 1) return 'just now'
+      if (mins < 60) return `${mins}m ago`
+      const hrs = Math.floor(mins / 60)
+      if (hrs < 24) return `${hrs}h ago`
+      return `${Math.floor(hrs / 24)}d ago`
+    }
+
+    function outDuration(dateStr) {
+      const diff = Date.now() - new Date(dateStr)
+      const hrs = Math.floor(diff / 3600000)
+      const mins = Math.floor((diff % 3600000) / 60000)
+      if (hrs === 0) return `${mins}m`
+      if (mins === 0) return `${hrs}h`
+      return `${hrs}h ${mins}m`
+    }
+
+    // ── AUTO REFRESH every 5 minutes, only when tab is visible ──
+    setInterval(() => {
+      if (
+        document.getElementById('dashboard').style.display !== 'none' &&
+        document.visibilityState === 'visible'
+      ) {
+        loadDashboard()
+      }
+    }, 5 * 60 * 1000)
+  </script>
 </body>
+
 </html>
