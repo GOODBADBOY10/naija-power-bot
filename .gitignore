@@ -1,0 +1,11 @@
+node_modules/
+auth_info/
+.env
+*.log
+logs/
+
+./scripts/clearSession.js
+scripts/clearSession.js
+clearSession.js
+../clearSession.js
+scripts
