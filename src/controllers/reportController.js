@@ -2,7 +2,7 @@
 
 const reportService = require('../services/reportService')
 const subscriptionService = require('../services/subscriptionService')
-const { capitalize, getTimeAgo, sanitizeArea } = require('../utils/helpers')
+const { capitalize, getTimeAgo, sanitizeArea, getOutageDuration } = require('../utils/helpers')
 const { ValidationError } = require('../utils/errors')
 const logger = require('../utils/logger')
 
@@ -74,10 +74,13 @@ Thank you for keeping Nigeria powered! 🇳🇬`,
   REPORT_CREATED_LIGHT_BACK: (area) =>
     `✅ Reported *LIGHT BACK* in *${area}*.\nThank you for the update! 🙏`,
 
-  STATUS_RESPONSE: (area, status, timeAgo) => {
+  STATUS_RESPONSE: (area, status, timeAgo, firstReportedAt) => {
     const emoji = status === 'no light' ? '❌' : '✅'
     const statusText = status === 'no light' ? 'NO LIGHT' : 'LIGHT BACK'
-    return `${emoji} *${area}*\nStatus: *${statusText}*\nReported: ${timeAgo}`
+    const duration = status === 'no light' && firstReportedAt
+      ? `\nWithout light for: *${getOutageDuration(firstReportedAt)}*`
+      : ''
+    return `${emoji} *${area}*\nStatus: *${statusText}*\nReported: ${timeAgo}${duration}`
   },
 
   NO_ACTIVE_REPORTS: `📭 No active reports at the moment.\n\nBe the first to report your area's power situation!`,
@@ -259,7 +262,7 @@ const handleAreaCheck = async (text) => {
       if (area.length > 50) throw new ValidationError('Area name is too long. Please be more specific.')
       const report = await reportService.getLatestReport(area)
       if (!report) return MESSAGES.NO_REPORT_FOUND(area)
-      return MESSAGES.STATUS_RESPONSE(area, report.status, getTimeAgo(report.createdAt))
+        return MESSAGES.STATUS_RESPONSE(area, report.status, getTimeAgo(report.createdAt), report.firstReportedAt)
     }
   }
 
@@ -272,7 +275,7 @@ const handleAreaCheck = async (text) => {
       if (area.length > 50) throw new ValidationError('Area name is too long. Please be more specific.')
       const report = await reportService.getLatestReport(area)
       if (!report) return MESSAGES.NO_REPORT_FOUND(area)
-      return MESSAGES.STATUS_RESPONSE(area, report.status, getTimeAgo(report.createdAt))
+        return MESSAGES.STATUS_RESPONSE(area, report.status, getTimeAgo(report.createdAt), report.firstReportedAt)
     }
   }
 

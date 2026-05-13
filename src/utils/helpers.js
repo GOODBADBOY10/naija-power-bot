@@ -56,6 +56,24 @@ const extractMessageText = (message) => {
   ).trim()
 }
 
+/**
+ * Get how long an area has been without light
+ * @param {Date} firstReportedAt
+ * @returns {string}
+ */
+const getOutageDuration = (firstReportedAt) => {
+  if (!firstReportedAt) return null
+
+  const now = new Date()
+  const diff = now - new Date(firstReportedAt)
+
+  const hours = Math.floor(diff / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+
+  if (hours === 0) return `${minutes} minute${minutes !== 1 ? 's' : ''}`
+  if (minutes === 0) return `${hours} hour${hours !== 1 ? 's' : ''}`
+  return `${hours} hour${hours !== 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`
+}
 
 /**
  * Sanitize and validate area name input
@@ -78,4 +96,5 @@ module.exports = {
   getExpiryDate,
   extractMessageText,
   sanitizeArea,
+  getOutageDuration,
 }

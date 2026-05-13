@@ -28,22 +28,24 @@ const reportSchema = new mongoose.Schema(
       trim: true,
       default: 'anonymous',
     },
+    firstReportedAt: {
+      type: Date,
+      default: null, // only set for 'no light' reports
+    },
     expiresAt: {
       type: Date,
       required: [true, 'Expiry date is required'],
-      index: { expireAfterSeconds: 0 }, // MongoDB TTL index auto-deletes expired docs
+      index: { expireAfterSeconds: 0 },
     },
   },
   {
-    timestamps: true, // adds createdAt and updatedAt automatically
+    timestamps: true,
     versionKey: false,
   }
 )
 
-// Compound index for fast area + status queries
 reportSchema.index({ area: 1, createdAt: -1 })
 
-// Static method to find latest report for an area
 reportSchema.statics.findLatestByArea = function (area) {
   return this.findOne({
     area: new RegExp(area, 'i'),
@@ -51,11 +53,19 @@ reportSchema.statics.findLatestByArea = function (area) {
   }).sort({ createdAt: -1 })
 }
 
-// Static method to get all active reports
 reportSchema.statics.findAllActive = function () {
   return this.find({
     expiresAt: { $gt: new Date() },
   }).sort({ createdAt: -1 })
+}
+
+// Find the earliest active 'no light' report for an area
+reportSchema.statics.findFirstNoLightReport = function (area) {
+  return this.findOne({
+    area: new RegExp(`^${area}$`, 'i'),
+    status: STATUSES.NO_LIGHT,
+    expiresAt: { $gt: new Date() },
+  }).sort({ createdAt: 1 }) // oldest first
 }
 
 const Report = mongoose.model('Report', reportSchema)

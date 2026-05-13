@@ -12,13 +12,11 @@ const logger = require('../utils/logger')
  */
 const subscribe = async (phone, area) => {
   try {
-    // Use findOneAndUpdate with upsert to avoid duplicates
     const subscription = await Subscription.findOneAndUpdate(
       { phone, area: new RegExp(`^${area}$`, 'i') },
       { phone, area, active: true },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' } // 👈 fixed
     )
-
     logger.info(`🔔 New subscription — Phone: ${phone}, Area: ${area}`)
     return subscription
   } catch (error) {
@@ -27,22 +25,14 @@ const subscribe = async (phone, area) => {
   }
 }
 
-/**
- * Unsubscribe a phone number from an area
- * @param {string} phone
- * @param {string} area
- * @returns {Promise<boolean>}
- */
 const unsubscribe = async (phone, area) => {
   try {
     const result = await Subscription.findOneAndUpdate(
       { phone, area: new RegExp(`^${area}$`, 'i') },
       { active: false },
-      { new: true }
+      { returnDocument: 'after' } // 👈 fixed
     )
-
     if (!result) return false
-
     logger.info(`🔕 Unsubscribed — Phone: ${phone}, Area: ${area}`)
     return true
   } catch (error) {
