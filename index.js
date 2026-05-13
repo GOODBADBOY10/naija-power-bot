@@ -5,6 +5,8 @@ require('dotenv').config()
 const { connectDatabase, disconnectDatabase } = require('./src/config/database')
 const { startBot } = require('./src/bot')
 const { startExpireReportsJob } = require('./src/jobs/expireReports')
+const { startKeepAliveJob } = require('./src/jobs/keepAlive')
+const { startServer } = require('./src/server')
 const logger = require('./src/utils/logger')
 const { appName, nodeEnv } = require('./src/config/env')
 
@@ -15,10 +17,16 @@ const bootstrap = async () => {
     // 1. Connect to database
     await connectDatabase()
 
-    // 2. Start cron jobs
+    // 2. Start HTTP server (keeps Render awake + health check)
+    startServer()
+
+    // 3. Start cron jobs
     startExpireReportsJob()
 
-    // 3. Start WhatsApp bot
+    // 4. Start keep-alive ping
+    startKeepAliveJob()
+
+    // 5. Start WhatsApp bot
     await startBot()
 
     logger.info(`✅ ${appName} is fully up and running!`)
@@ -31,7 +39,6 @@ const bootstrap = async () => {
 // Graceful shutdown handlers
 const shutdown = async (signal) => {
   logger.info(`⚠️ ${signal} received. Shutting down gracefully...`)
-
   try {
     await disconnectDatabase()
     logger.info('✅ Shutdown complete.')
@@ -45,13 +52,11 @@ const shutdown = async (signal) => {
 process.on('SIGTERM', () => shutdown('SIGTERM'))
 process.on('SIGINT', () => shutdown('SIGINT'))
 
-// Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
   logger.error('❌ Uncaught Exception:', error)
   process.exit(1)
 })
 
-// Handle unhandled promise rejections
 process.on('unhandledRejection', (reason) => {
   logger.error('❌ Unhandled Rejection:', reason)
   process.exit(1)
