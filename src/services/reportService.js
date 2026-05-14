@@ -4,30 +4,33 @@ const { Report, STATUSES } = require('../models/Report')
 const { DatabaseError } = require('../utils/errors')
 const { getExpiryDate } = require('../utils/helpers')
 const { reportExpiryHours } = require('../config/env')
+const { sendLightBackAlerts, sendNoLightAlerts } = require('./alertService')
 const logger = require('../utils/logger')
 
 const createReport = async (area, status, reportedBy = 'anonymous') => {
   try {
     const expiresAt = getExpiryDate(reportExpiryHours)
 
-    let firstReportedAt = null
-
-    if (status === STATUSES.NO_LIGHT) {
-      // Check if there's already an active 'no light' report for this area
-      const existingReport = await Report.findFirstNoLightReport(area)
-      // If one exists, carry forward its firstReportedAt, otherwise use now
-      firstReportedAt = existingReport?.firstReportedAt || existingReport?.createdAt || new Date()
-    }
-
     const report = await Report.create({
       area,
       status,
       reportedBy,
-      firstReportedAt,
       expiresAt,
     })
 
     logger.info(`📝 New report created — Area: ${area}, Status: ${status}`)
+
+    // Trigger alerts to subscribers
+    if (status === STATUSES.LIGHT_BACK) {
+      sendLightBackAlerts(area).catch((err) =>
+        logger.error('Error sending light back alerts:', err)
+      )
+    } else if (status === STATUSES.NO_LIGHT) {
+      sendNoLightAlerts(area).catch((err) =>
+        logger.error('Error sending no light alerts:', err)
+      )
+    }
+
     return report
   } catch (error) {
     logger.error('Error creating report:', error)

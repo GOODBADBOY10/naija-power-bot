@@ -87,7 +87,14 @@ Thank you for keeping Nigeria powered! 🇳🇬`,
 
   ERROR: `⚠️ Something went wrong. Please try again in a moment.`,
 
-  UNKNOWN: `🤔 I no understand that message.\n\nTry something like:\n• *no light - Yaba* — to report outage\n• *light back - Ikeja* — to report power restored\n• *any light in Surulere?* — to check an area\n• *subscribe Yaba* — to get alerts\n\nSend *help* to see all commands.`,
+  UNKNOWN: `🤔 I no understand that message.\n\n
+  Try something like:\n
+  • *no light - Yaba* — to report outage\n
+  • *light back - Ikeja* — to report power restored\n
+  • *any light in Surulere?* — to check an area\n
+  • *subscribe Yaba* — to get alerts\n\n
+  Send *help* to see all commands.
+  `,
 }
 
 /**
