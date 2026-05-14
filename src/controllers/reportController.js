@@ -420,8 +420,8 @@ const handleMessage = async (text, reportedBy) => {
     const normalizedText = text.trim().toLowerCase()
 
     const result =
-      (await handleSubscribe(normalizedText, reportedBy)) ||
       (await handleUnsubscribe(normalizedText, reportedBy)) ||
+      (await handleSubscribe(normalizedText, reportedBy)) ||
       (await handleMySubscriptions(normalizedText, reportedBy)) ||
       (await handleNoLightReport(normalizedText, reportedBy)) ||
       (await handleLightBackReport(normalizedText, reportedBy)) ||
